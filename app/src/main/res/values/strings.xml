@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">MyApp</string>
+    <string name="hello">The temperature converter</string>
+    <string name="hint_input">Celsius tempreture(℃)</string>
+    <string name="btn_Transform">℃ -> ℉</string>
+    <string name="hint_result">Fahrenheit degree(℉)</string>
+    <string name="from">from</string>
+    <string name="date">2020.03.20</string>
+
+
+    <string name="label_add3a">+3 points</string>
+    <string name="label_add2a">+2 points</string>
+    <string name="label_add1a">+1 point</string>
+    <string name="text_Teama">TeamA</string>
+    <string name="scorea">reset</string>
+    <string name="label_add3b">+3 points</string>
+    <string name="label_add2b">+2 points</string>
+    <string name="label_add1b">+1 point</string>
+    <string name="text_Teamb">TeamB</string>
+    <string name="scoreb">reset</string>
+    <string name="btnReset">reset</string>
+
+    <string name="btn_dollar_label">Dollar</string>
+    <string name="btn_euro_label">Euro</string>
+    <string name="btn_won_label">Won</string>
+    <string name="rmb_hint">Input RMB</string>
+    <string name="hint_txt">Input your name</string>
+
+
+</resources>
