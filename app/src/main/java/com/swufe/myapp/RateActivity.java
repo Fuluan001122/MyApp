@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,21 +19,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class RateActivity extends AppCompatActivity implements Runnable{
 
     private final String TAG = "Rate";
 
     private float dollarRate = 0.1f;
-    private float euroRate = 0.0f;
-    private float wonRate = 0.0f;
+    private float euroRate = 0.2f;
+    private float wonRate = 0.3f;
+    private String updateDate = "";
 
     EditText rmb;
     TextView show;
@@ -54,27 +59,59 @@ public class RateActivity extends AppCompatActivity implements Runnable{
         dollarRate = sharedPreferences.getFloat("dollar_rate",0.0f);
         euroRate = sharedPreferences.getFloat("euro_rate",0.0f);
         wonRate = sharedPreferences.getFloat("won_rate",0.0f);
+
+        String updateDate = sharedPreferences.getString("update_date","");
+        //获取当前系统时间
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        final String todayStr = sdf.format(today); //转型
+
         //defValue设置默认值
         Log.i(TAG, "onCreate: sp dollarRate=" + dollarRate);
         Log.i(TAG, "onCreate: sp euroRate=" + euroRate);
         Log.i(TAG, "onCreate: sp wonRate=" + wonRate);
+        Log.i(TAG, "onCreate: sp updateDate=" + updateDate);
+        Log.i(TAG, "onCreate: todayStr=" + todayStr);
 
-        //开启子线程
-        Thread t = new Thread(this);//要加上当前对象使用接口，避免冲突
-        t.start();
+        //判断时间
+        if(!todayStr.equals(updateDate)){
+            Log.i(TAG, "onCreate: 需要更新");
+            //开启子线程
+            Thread t = new Thread(this);
+            t.start();
+        }else{
+            Log.i(TAG, "onCreate: 不需要更新");
+        }
 
         handler = new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 if(msg.what==5){
-                    String str = (String) msg.obj;//强制转型
-                    Log.i(TAG, "handleMessage: getMessage msg = " + str);
-                    show.setText(str);
+                    Bundle bdl = (Bundle) msg.obj;//强制转型
+                    dollarRate = bdl.getFloat("dollar-rate");
+                    euroRate = bdl.getFloat("euro-rate");
+                    wonRate = bdl.getFloat("won-rate");
+                    /*Log.i(TAG, "handleMessage: getMessage msg = " + str);
+                    show.setText(str);*/
+                    Log.i(TAG, "handleMessage: dollarRate = " + dollarRate);
+                    Log.i(TAG, "handleMessage: euroRate = " + euroRate);
+                    Log.i(TAG, "handleMessage: wonRate = " + wonRate);
+
+                    Toast.makeText(RateActivity.this,"汇率已更新",Toast.LENGTH_SHORT).show();
                 }
                 super.handleMessage(msg);
+
+                //保存更新的日期
+                SharedPreferences sp = getSharedPreferences("myrate", Activity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putFloat("dollar_rate",dollarRate);
+                editor.putFloat("euro_rate",euroRate);
+                editor.putFloat("won_rate",wonRate);
+                String todayStr = new String();
+                editor.putString("update_date",todayStr);
+                editor.apply();
             }
         };//类和类方法，重写
-
     }
 
     @SuppressLint("DefaultLocale")
@@ -199,25 +236,21 @@ public class RateActivity extends AppCompatActivity implements Runnable{
 
     @Override
     public void run() {
-        Log.i(TAG, "run: run()......");
+        //用于保存获取的利率
+        Bundle bundle = new Bundle();
+
         Log.i(TAG, "run: run()......");
         for(int i=1;i<6;i++){
             Log.i(TAG, "run: i=" + i);
             try {
-                Thread.sleep(2000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }//当前停止两秒钟
         }
 
-        //获取Msg对象，用于返回主线程
-        Message msg = handler.obtainMessage(5);
-        //msg.what = 5;
-        msg.obj = "Hello from run()";
-        handler.sendMessage(msg);
-
         //获取网络数据
-        URL url = null;
+        /*URL url = null;
         try {
             url = new URL("http://www.usd-cny.com/icbc.htm");
             HttpURLConnection http = (HttpURLConnection) url.openConnection();//强制转型
@@ -225,12 +258,131 @@ public class RateActivity extends AppCompatActivity implements Runnable{
 
             String html = inputStream2String(in);
             Log.i(TAG, "run: html=" + html);
+            Document doc = Jsoup.parse(html);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }*/
+
+
+       // bundle = getFromBOC();
+
+        //获取Msg对象，用于返回主线程
+        Message msg = handler.obtainMessage(5);
+        //msg.what = 5;
+        msg.obj = "Hello from run()";
+        handler.sendMessage(msg);
+
+    }
+
+    /*
+    从bankofchina获取数据
+     */
+    private Bundle GetFromBOC() {
+        Bundle bundle = new Bundle();
+        Document doc = null;
+            try {
+                doc = Jsoup.connect("http://www.usd-cny.com/bankofchina.htm").get();
+                //相当于  doc = Jsoup.parse(html);
+                Log.i(TAG, "run: " + doc.title());
+                Elements tables = doc.getElementsByTag("table");//得到集合
+                /*for(Element table : tables){
+                    Log.i(TAG, "run: table=["+i+"]" + table);
+                    i++;
+                }*/
+
+                Element table6 = tables.get(5);
+                //Log.i(TAG, "run: table6=" + table6);
+                //获取TD中的数据
+                Elements tds = table6.getElementsByTag("td");
+                for(int i = 0;i<tds.size();i+=8){
+                    Element td1 = tds.get(i);
+                    Element td2 = tds.get(i+5);
+                    Log.i(TAG, "run: " + td1.text() + "==>" + td2.text());
+                    String str1 = td1.text();
+                    String val = td2.text();
+
+                    float v = 100f / Float.parseFloat(val);
+                    if("美元".equals(str1)){
+                        bundle.putFloat("dollar-rate", v);
+                    }else if("欧元".equals(str1)){
+                        bundle.putFloat("euro-rate", v);
+                    }else if("韩国元".equals(str1)){
+                        bundle.putFloat("won-rate", v);
+                    }
+                }
+
+
+               /* for(Element td : tds){
+                    Log.i(TAG, "run: td=" + td);
+                    Log.i(TAG, "run: text=" + td.text());
+                    Log.i(TAG, "run: html=" + td.html());
+                }*/
+
+                /*Elements newsHeadinglines = doc.select("#mp-itn b a");
+                for(Element headline : newsHeadinglines){
+                    Log.i(TAG, "%s\n\t%s" + headline.attr("title") + headline.absUrl("href"));
+                }*/
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bundle;
+    }
+
+    /*
+    从bankofchina获取数据
+     */
+    private Bundle GetFromUsdCny() {
+        Bundle bundle = new Bundle();
+        Document doc = null;
+        try {
+            doc = Jsoup.connect("http://www.boc.cn/sourcedb/whpj/").get();
+            //相当于  doc = Jsoup.parse(html);
+            Log.i(TAG, "run: " + doc.title());
+            Elements tables = doc.getElementsByTag("table");//得到集合
+                /*for(Element table : tables){
+                    Log.i(TAG, "run: table=["+i+"]" + table);
+                    i++;
+                }*/
+
+            Element table6 = tables.get(1);
+            //Log.i(TAG, "run: table6=" + table6);
+            //获取TD中的数据
+            Elements tds = table6.getElementsByTag("td");
+            for(int i = 0;i<tds.size();i+=8){
+                Element td1 = tds.get(i);
+                Element td2 = tds.get(i+5);
+                Log.i(TAG, "run: " + td1.text() + "==>" + td2.text());
+                String str1 = td1.text();
+                String val = td2.text();
+
+                float v = 100f / Float.parseFloat(val);
+                if("美元".equals(str1)){
+                    bundle.putFloat("dollar-rate", v);
+                }else if("欧元".equals(str1)){
+                    bundle.putFloat("euro-rate", v);
+                }else if("韩国元".equals(str1)){
+                    bundle.putFloat("won-rate", v);
+                }
+            }
+
+
+               /* for(Element td : tds){
+                    Log.i(TAG, "run: td=" + td);
+                    Log.i(TAG, "run: text=" + td.text());
+                    Log.i(TAG, "run: html=" + td.html());
+                }*/
+
+                /*Elements newsHeadinglines = doc.select("#mp-itn b a");
+                for(Element headline : newsHeadinglines){
+                    Log.i(TAG, "%s\n\t%s" + headline.attr("title") + headline.absUrl("href"));
+                }*/
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return bundle;
     }
 
     private String inputStream2String(InputStream inputStream) throws IOException {
@@ -246,6 +398,5 @@ public class RateActivity extends AppCompatActivity implements Runnable{
         }
         return out.toString();
     }
+
 }
-
-

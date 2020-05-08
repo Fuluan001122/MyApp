@@ -2,4 +2,5 @@
 <resources>
     <item name="et_input" type="id" />
     <item name="score" type="id" />
+    <item name="score2" type="id" />
 </resources>

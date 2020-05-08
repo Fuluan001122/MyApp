@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.swufe.myapp">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.swufe.myapp"
+    tools:ignore="ExtraText">
 
-    //添加网络访问权限
+    <!--添加网络访问权限-->
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
