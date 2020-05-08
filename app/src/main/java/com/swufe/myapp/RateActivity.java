@@ -1,8 +1,5 @@
 package com.swufe.myapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +15,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -198,8 +198,12 @@ public class RateActivity extends AppCompatActivity implements Runnable{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.menu_set){
+        if(item.getItemId()==R.id.open_list){
            openConfig();
+        }else if(item.getItemId()==R.id.menu_set){
+            //打开列表窗口
+            Intent list = new Intent(this,MyListActivity.class);
+            startActivity(list);
         }
 
         return super.onOptionsItemSelected(item);
@@ -272,7 +276,7 @@ public class RateActivity extends AppCompatActivity implements Runnable{
         //获取Msg对象，用于返回主线程
         Message msg = handler.obtainMessage(5);
         //msg.what = 5;
-        msg.obj = "Hello from run()";
+        msg.obj = bundle;
         handler.sendMessage(msg);
 
     }
@@ -347,24 +351,26 @@ public class RateActivity extends AppCompatActivity implements Runnable{
                     i++;
                 }*/
 
-            Element table6 = tables.get(1);
+            Element table2 = tables.get(1);
             //Log.i(TAG, "run: table6=" + table6);
             //获取TD中的数据
-            Elements tds = table6.getElementsByTag("td");
+            Elements tds = table2.getElementsByTag("td");
             for(int i = 0;i<tds.size();i+=8){
                 Element td1 = tds.get(i);
                 Element td2 = tds.get(i+5);
-                Log.i(TAG, "run: " + td1.text() + "==>" + td2.text());
+
                 String str1 = td1.text();
                 String val = td2.text();
 
-                float v = 100f / Float.parseFloat(val);
+                Log.i(TAG, "run: " + str1 + "==>" + val);
+
+//                float v = 100f / Float.parseFloat(val);
                 if("美元".equals(str1)){
-                    bundle.putFloat("dollar-rate", v);
+                    bundle.putFloat("dollar-rate",100f/Float.parseFloat(val));
                 }else if("欧元".equals(str1)){
-                    bundle.putFloat("euro-rate", v);
+                    bundle.putFloat("euro-rate", 100f/Float.parseFloat(val));
                 }else if("韩国元".equals(str1)){
-                    bundle.putFloat("won-rate", v);
+                    bundle.putFloat("won-rate", 100f/Float.parseFloat(val));
                 }
             }
 

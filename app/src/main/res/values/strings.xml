@@ -28,6 +28,7 @@
     <string name="rmb_hint">Input RMB</string>
     <string name="btn_opencfg_label">config</string>
     <string name="menu_set_label">setting</string>
+    <string name="label_open_list">OpenList</string>
 
 
 </resources>
