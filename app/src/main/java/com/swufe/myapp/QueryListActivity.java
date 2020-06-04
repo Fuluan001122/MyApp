@@ -126,7 +126,7 @@ public class QueryListActivity extends ListActivity implements Runnable, Adapter
                 SharedPreferences sp = getSharedPreferences("title", Activity.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
 
-                editor.putString("通知公告"+i,"title");
+                editor.putString("通知公告"+i, "title");
 
 
             }
