@@ -31,4 +31,11 @@
     <string name="label_open_list">OpenList</string>
 
 
+    <string name="query_name">College Information Query</string>
+    <string name="query_keywords" />
+    <string name="query_hint">Please enter query keywords</string>
+    <string name="query_btn">QUERY</string>
+    <string name="query_result">Query results list:</string>
+    <string name="query_list" />
+
 </resources>

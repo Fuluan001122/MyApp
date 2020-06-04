@@ -31,10 +31,10 @@ public class MyAdapter extends ArrayAdapter {
 
         Map<String,String> map = (Map<String, String>) getItem(position);
         TextView title = (TextView) itemView.findViewById(R.id.itemTitle);
-        TextView detail = (TextView) itemView.findViewById(R.id.itemDetail);
+        TextView detail = (TextView) itemView.findViewById(R.id.itemURL);
 
         title.setText("Title:" + map.get("ItemTitle"));
-        detail.setText("detail:" + map.get("ItemDetail"));
+        detail.setText("detail:" + map.get("ItemURL"));
 
         return itemView;
 

@@ -21,7 +21,7 @@
         android:layout_width="fill_parent"/>
 
     <TextView
-        android:id="@+id/itemDetail"
+        android:id="@+id/itemURL"
         android:layout_height="wrap_content"
         android:textSize="15sp"
         android:text="@string/app_name"

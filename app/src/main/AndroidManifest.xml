@@ -14,28 +14,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MyList2Activity"></activity>
+
+        <activity android:name=".QueryActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".QueryListActivity" />
+        <activity android:name=".MyList2Activity" />
         <activity android:name=".MyListActivity" />
         <activity android:name=".RateListActivity" />
         <activity android:name=".ConfigActivity" />
-        <activity android:name=".MainActivity">
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
-        </activity>
-        <activity android:name=".RateActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".ScoreActivity" />
-        <activity android:name=".Week4Activity" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
